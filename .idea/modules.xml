@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Resource Processor/Resource Processor.iml" filepath="$PROJECT_DIR$/Resource Processor/Resource Processor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Resource Service/Resource Service.iml" filepath="$PROJECT_DIR$/Resource Service/Resource Service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Song Service/Song Service.iml" filepath="$PROJECT_DIR$/Song Service/Song Service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Task.iml" filepath="$PROJECT_DIR$/Task.iml" />
+    </modules>
+  </component>
+</project>
