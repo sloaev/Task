@@ -7,7 +7,7 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -27,14 +27,27 @@ public class RabbitMQUtils {
 
     Logger logger = LoggerFactory.getLogger(RabbitMQUtils.class);
 
-    @Retryable(maxAttempts = 10, value = RestClientException.class, backoff = @Backoff(delay = 500, multiplier = 4))
+    @Retryable(maxAttempts = 5, value = RestClientException.class, backoff = @Backoff(delay = 500, multiplier = 2))
     protected void postToSongService(SongDto dto, RestTemplate restTemplate) {
         logger.info("trying to post to song service...");
         ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://localhost:8082/soser/postInfo",dto, String.class);
         logger.info("successfully posted");
     }
 
-    @Retryable(maxAttempts = 10, value = Exception.class, backoff = @Backoff(delay = 500, multiplier = 4))
+    @Retryable(maxAttempts = 5, value = Exception.class, backoff = @Backoff(delay = 500, multiplier = 2))
+    protected void deleteFromSongService(String ids, RestTemplate restTemplate) {
+        logger.info("trying to delete from song service...");
+//        restTemplate.delete("http://localhost:8082/soser/delete");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        restTemplate.exchange("http://localhost:8082/soser/delete",
+                HttpMethod.DELETE,
+                new HttpEntity<>("[" + ids + "]",headers),
+                String.class);
+        logger.info("successfully deleted");
+    }
+
+    @Retryable(maxAttempts = 5, value = Exception.class, backoff = @Backoff(delay = 500, multiplier = 2))
     protected ResponseEntity<byte []> getFromResourceService(String resourceId, RestTemplate restTemplate) {
         logger.info("trying to get from resource service....");
         ResponseEntity<byte[]> responseEntity = restTemplate.getForEntity("http://localhost:8081/reser/downloadv2?id=" + resourceId, byte[].class);

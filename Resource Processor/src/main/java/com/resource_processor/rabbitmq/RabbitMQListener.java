@@ -22,9 +22,9 @@ public class RabbitMQListener {
     @Autowired
     RabbitMQUtils rabbitMQUtils;
 
-    @RabbitListener(queues = "REStoREP")
+    @RabbitListener(queues = "ResToRepCRE")
     public void processMyQueue(String resourceId) {
-        logger.info("Receive from REPListener:" + resourceId);
+        logger.info("Receive from REPListener id for creation:" + resourceId);
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         ResponseEntity<byte[]> content = rabbitMQUtils.getFromResourceService(resourceId, restTemplate);
         try {
@@ -35,6 +35,13 @@ public class RabbitMQListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @RabbitListener(queues = "ResToRepDEL")
+    public void deletionQueue(String ids){
+        logger.info("Receive from REPListener ids for deletion:" + ids);
+        RestTemplate restTemplate = new RestTemplateBuilder().build();
+        rabbitMQUtils.deleteFromSongService(ids, restTemplate);
     }
 
 }

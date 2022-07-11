@@ -32,7 +32,7 @@ public class SongServiceController {
 
     @DeleteMapping(value = "/delete", produces = {"application/json"})
     public ResponseEntity<List<Integer>> deleteInfo(@RequestBody List<Integer> ids) {
-        songService.deleteAllById(ids);
+        songService.deleteAllByResourceIdIn(ids);
         return ResponseEntity.ok(ids);
     }
 }

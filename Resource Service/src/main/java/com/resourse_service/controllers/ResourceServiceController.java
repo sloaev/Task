@@ -34,16 +34,19 @@ public class ResourceServiceController {
         Song song = songService.create();
         song.setSongPath(songStorageService.storeSong(songBody,song.getId()));
         songService.save(song);
-        rabbitTemplate.convertAndSend("REStoREP",song.getId());
+        rabbitTemplate.convertAndSend("ResToRepCRE",song.getId());
         return ResponseEntity.ok("{\"id\":\"" +song.getId()+ "\"}");
     }
 
     @PostMapping(value = "/uploadv2",produces = {"application/json"})
-    public ResponseEntity<String> uploadSongv2(@RequestBody MultipartFile file){
+    public ResponseEntity<String> uploadSongv2(@RequestParam(name = "file") MultipartFile file,
+                                               @RequestHeader(required = false,value = "test") Boolean test){
         Song song = songService.create();
         song.setSongPath(songStorageService.storeSong(file,song.getId()));
         songService.save(song);
-        rabbitTemplate.convertAndSend("REStoREP",song.getId());
+        if(test == null || !test) {
+            rabbitTemplate.convertAndSend("ResToRepCRE", song.getId());
+        }
         return ResponseEntity.ok("{\"id\":\"" +song.getId() + "\"}");
     }
 
@@ -58,11 +61,15 @@ public class ResourceServiceController {
     }
 
     @DeleteMapping(value = "delete", consumes = {"application/json"}, produces = {"application/json"})
-    public ResponseEntity<List<Integer>> delete(@RequestBody List<Integer> ids){
+    public ResponseEntity<List<Integer>> delete(@RequestBody List<Integer> ids,
+                                                @RequestHeader("test") Boolean test){
         for (Integer id: ids) {
             Song song = songService.getById(id);
             songStorageService.deleteSong(song.getSongPath());
             songService.delete(song);
+        }
+        if(!test){
+            rabbitTemplate.convertAndSend("ResToRepDEL",ids);
         }
         return ResponseEntity.ok(ids);
     }

@@ -2,9 +2,11 @@ package com.resourse_service.db.services;
 
 import com.resourse_service.db.entities.Song;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SongService extends CrudRepository<Song, Integer> {
 
     /**
