@@ -1,5 +1,8 @@
-package com.resourse_service.controllers;
+package com.song_service.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.song_service.dto.SongDto;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -8,30 +11,27 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureMockMvc
 @SpringBootTest
-class ResourceServiceControllerTest {
-
-    @Autowired
-    ResourceServiceController controller;
+class SongServiceControllerTest {
 
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    private SongServiceController controller;
+
     private static Integer id;
 
     @Test
@@ -42,35 +42,31 @@ class ResourceServiceControllerTest {
 
     @Test
     @Order(1)
-    void hey() throws Exception {
-        this.mvc.perform(get("/reser/hey")).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString("Hello there")));
-    }
-
-    @Test
-    @Order(2)
-    void uploadSongv2() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("data", "testMusic.mp3", "audio/mpeg", "some song".getBytes());
-        MvcResult result =  mvc.perform(MockMvcRequestBuilders.multipart("/reser/uploadv2").file("file",file.getBytes()).header("test","true"))
-                .andExpect(status().is(200)).andReturn();
+    void postInfo() throws Exception {
+        SongDto dto = new SongDto("Haski","mur","Marmelad","10:23",17,2017);
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = ow.writeValueAsString(dto);
+        MvcResult result = mvc.perform(post("/soser/postInfo").content(json).contentType("application/json"))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andReturn();
         id = Integer.valueOf(result.getResponse().getContentAsString().replaceAll("[^0-9]",""));
     }
 
     @Test
-    @Order(3)
-    void downloadSongV2() throws Exception {
-        mvc.perform(get("/reser/downloadv2?id="+ id).contentType("application/json"))
+    @Order(2)
+    void getInfo() throws Exception {
+        mvc.perform(get("/soser/getInfo?id="+ id).contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().is(200));
     }
 
     @Test
-    @Order(4)
-    void deleteSong() throws Exception {
-        mvc.perform(delete("/reser/delete")
-                        .content("[" + id.toString() + "]")
-                        .contentType("application/json")
-                        .header("test","true"))
+    @Order(3)
+    void deleteInfo() throws Exception {
+        mvc.perform(delete("/soser/delete")
+                        .content("[17]")
+                        .contentType("application/json"))
                 .andExpect(status().is(200));
     }
 }

@@ -29,15 +29,6 @@ public class ResourceServiceController {
         return "Hello there";
     }
 
-    @PostMapping(value = "/upload", consumes = {"audio/mpeg"},produces = {"application/json"})
-    public ResponseEntity<String> uploadSong(@RequestBody String songBody){
-        Song song = songService.create();
-        song.setSongPath(songStorageService.storeSong(songBody,song.getId()));
-        songService.save(song);
-        rabbitTemplate.convertAndSend("ResToRepCRE",song.getId());
-        return ResponseEntity.ok("{\"id\":\"" +song.getId()+ "\"}");
-    }
-
     @PostMapping(value = "/uploadv2",produces = {"application/json"})
     public ResponseEntity<String> uploadSongv2(@RequestParam(name = "file") MultipartFile file,
                                                @RequestHeader(required = false,value = "test") Boolean test){
@@ -48,11 +39,6 @@ public class ResourceServiceController {
             rabbitTemplate.convertAndSend("ResToRepCRE", song.getId());
         }
         return ResponseEntity.ok("{\"id\":\"" +song.getId() + "\"}");
-    }
-
-    @GetMapping(value = "/download")
-    public String downloadSong(@RequestParam(value = "id") Integer id) {
-        return songStorageService.unstoreSong(songService.getById(id).getSongPath());
     }
 
     @GetMapping(value = "/downloadv2")
