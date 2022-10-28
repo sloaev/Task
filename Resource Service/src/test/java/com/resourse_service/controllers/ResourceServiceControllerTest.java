@@ -1,5 +1,7 @@
 package com.resourse_service.controllers;
 
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureMockMvc
 @SpringBootTest
-class ResourceServiceControllerTest {
+public class ResourceServiceControllerTest {
 
     @Autowired
     ResourceServiceController controller;
@@ -39,6 +41,7 @@ class ResourceServiceControllerTest {
     public void contextLoads(){
         assertNotNull(controller);
     }
+
 
     @Test
     @Order(1)

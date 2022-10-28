@@ -1,6 +1,7 @@
 package com.resourse_service.storage;
 
 import com.resourse_service.db.services.SongService;
+import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +15,7 @@ import java.nio.file.StandardCopyOption;
 
 
 @Service
-public class LocalSongStorageService implements SongStorageService  {
+public class LocalSongStorageService implements SongStorageService {
 
     @Autowired
     SongService songService;
@@ -23,7 +24,7 @@ public class LocalSongStorageService implements SongStorageService  {
     @Override
     public String storeSong(MultipartFile file, Integer id) {
         Path destinationFile = Paths.get("/songDir");
-        String path = "newAudio" + id +".mp3";
+        String path = "newAudio" + id + ".mp3";
 
         if (!Files.exists(destinationFile)) {
             try {
@@ -44,7 +45,12 @@ public class LocalSongStorageService implements SongStorageService  {
 
     public byte[] unstoreSong(Integer id) {
         Path destinationFile = Paths.get("/songDir");
-        Path filePath = destinationFile.resolve(songService.getById(id).getSongPath());
+        Path filePath;
+        try {
+           filePath = destinationFile.resolve(songService.getById(id).getSongPath());
+        } catch (LazyInitializationException e) {
+            return new byte[2];
+        }
         byte[] fileContent;
         try {
             fileContent = Files.readAllBytes(filePath);
